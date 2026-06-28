@@ -8,6 +8,7 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const roomRoutes = require("./routes/roomRoutes");
 const errorHandler = require("./middleware/errorHandler");
+const initSocket = require("./sockets");
 
 const app = express();
 const server = http.createServer(app);
@@ -32,6 +33,8 @@ app.use("/api/rooms", roomRoutes);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
+
+initSocket(io);
 
 connectDB().then(() => {
   server.listen(PORT, () => {
