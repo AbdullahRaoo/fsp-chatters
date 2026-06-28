@@ -9,6 +9,7 @@ import { useSocket } from "@/hooks/useSocket";
 import { getRoomMessages } from "@/services/messageService";
 import { getRooms, joinRoom as apiJoinRoom } from "@/services/roomService";
 import { User, Room, RoomMessage } from "@/types";
+import { useRoomsStore } from "@/store/roomsStore";
 import RoomMessageBubble from "@/components/RoomMessageBubble";
 
 type RawRoomMessage = Omit<RoomMessage, "sender"> & {
@@ -36,6 +37,7 @@ export default function RoomChatPage({
   const { user: currentUser } = useAuthStore();
   const { socket } = useSocketStore();
   const { sendRoomMessage, joinRoom, leaveRoom } = useSocket();
+  const { updateRoom } = useRoomsStore();
 
   const [room, setRoom] = useState<Room | null>(null);
   const [messages, setMessages] = useState<RoomMessage[]>([]);
@@ -148,6 +150,7 @@ export default function RoomChatPage({
       const updated = await apiJoinRoom(roomId);
       setRoom(updated);
       setIsMember(true);
+      updateRoom(updated);
       const history = await getRoomMessages(roomId);
       setMessages(history);
     } catch (err) {

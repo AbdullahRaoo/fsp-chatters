@@ -13,6 +13,7 @@ import {
 } from "@/services/roomService";
 import { useAuthStore } from "@/store/authStore";
 import { useSocketStore } from "@/store/socketStore";
+import { useRoomsStore } from "@/store/roomsStore";
 import UserListItem from "./UserListItem";
 
 type Tab = "people" | "rooms";
@@ -31,8 +32,8 @@ export default function Sidebar() {
   const [usersLoading, setUsersLoading] = useState(true);
   const [usersError, setUsersError] = useState("");
 
-  // ── Rooms state ─────────────────────────────────────────────────────────────
-  const [rooms, setRooms] = useState<Room[]>([]);
+  // ── Rooms state (shared store so room page join updates sidebar) ─────────────
+  const { rooms, setRooms, addRoom, updateRoom } = useRoomsStore();
   const [roomsLoading, setRoomsLoading] = useState(false);
   const [roomsError, setRoomsError] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -106,7 +107,7 @@ export default function Sidebar() {
     setCreating(true);
     try {
       const room = await apiCreateRoom(newRoomName.trim());
-      setRooms((prev) => [room, ...prev]);
+      addRoom(room);
       setNewRoomName("");
       setShowCreateModal(false);
       router.push(`/chat/room/${room._id}`);
@@ -122,7 +123,7 @@ export default function Sidebar() {
     setRoomActionId(roomId);
     try {
       const updated = await apiJoinRoom(roomId);
-      setRooms((prev) => prev.map((r) => (r._id === roomId ? updated : r)));
+      updateRoom(updated);
     } catch {
       /* ignore */
     } finally {
@@ -134,7 +135,7 @@ export default function Sidebar() {
     setRoomActionId(roomId);
     try {
       const updated = await apiLeaveRoom(roomId);
-      setRooms((prev) => prev.map((r) => (r._id === roomId ? updated : r)));
+      updateRoom(updated);
       if (activeRoomId === roomId) router.push("/chat");
     } catch {
       /* ignore */
