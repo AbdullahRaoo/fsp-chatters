@@ -16,6 +16,7 @@ import { useSocketStore } from "@/store/socketStore";
 import { useRoomsStore } from "@/store/roomsStore";
 import { useThemeStore } from "@/store/themeStore";
 import UserListItem from "./UserListItem";
+import Brand from "./Brand";
 
 type Tab = "people" | "rooms";
 
@@ -175,7 +176,12 @@ export default function Sidebar() {
 
   return (
     <>
-      <aside className="flex flex-col w-72 shrink-0 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 h-full">
+      <aside className="flex flex-col w-screen md:w-72 shrink-0 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 h-full">
+        {/* Brand */}
+        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+          <Brand height={26} showText />
+        </div>
+
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
           <div className="min-w-0">
@@ -183,7 +189,7 @@ export default function Sidebar() {
               Signed in as
             </p>
             <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
-              {currentUser?.name ?? "—"}
+              {currentUser?.name ?? "-"}
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -211,7 +217,7 @@ export default function Sidebar() {
               onClick={() => setTab(t)}
               className={`flex-1 py-2 text-xs font-semibold uppercase tracking-wide transition-colors ${
                 tab === t
-                  ? "text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400"
+                  ? "text-sky-600 dark:text-sky-400 border-b-2 border-sky-600 dark:border-sky-400"
                   : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
               }`}
             >
@@ -229,13 +235,13 @@ export default function Sidebar() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search users…"
-                className="w-full rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
               />
             </div>
             <div className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5">
               {usersLoading ? (
                 <div className="flex items-center justify-center py-10">
-                  <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-sky-500 border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : usersError ? (
                 <p className="text-xs text-red-500 text-center py-6">
@@ -267,7 +273,7 @@ export default function Sidebar() {
             <div className="px-3 py-2.5 border-b border-gray-100 dark:border-gray-700/50">
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 py-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 hover:border-blue-400 hover:text-blue-500 dark:hover:border-blue-500 dark:hover:text-blue-400 transition-colors"
+                className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 py-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 hover:border-sky-400 hover:text-sky-500 dark:hover:border-sky-500 dark:hover:text-sky-400 transition-colors"
               >
                 <span className="text-base leading-none">+</span> New Room
               </button>
@@ -275,7 +281,7 @@ export default function Sidebar() {
             <div className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5">
               {roomsLoading ? (
                 <div className="flex items-center justify-center py-10">
-                  <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-sky-500 border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : roomsError ? (
                 <p className="text-xs text-red-500 text-center py-6">
@@ -296,7 +302,7 @@ export default function Sidebar() {
                       key={room._id}
                       className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
                         isActive
-                          ? "bg-blue-50 dark:bg-blue-900/30"
+                          ? "bg-sky-50 dark:bg-sky-900/30"
                           : "hover:bg-gray-50 dark:hover:bg-gray-700/60"
                       }`}
                     >
@@ -311,7 +317,7 @@ export default function Sidebar() {
                           <p
                             className={`text-sm font-medium truncate ${
                               isActive
-                                ? "text-blue-700 dark:text-blue-400"
+                                ? "text-sky-700 dark:text-sky-400"
                                 : "text-gray-800 dark:text-gray-200"
                             }`}
                           >
@@ -337,7 +343,7 @@ export default function Sidebar() {
                         className={`shrink-0 text-xs px-2 py-1 rounded-md font-medium transition-colors disabled:opacity-50 ${
                           joined
                             ? "text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
-                            : "text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                            : "text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/20"
                         }`}
                       >
                         {actionLoading ? "…" : joined ? "Leave" : "Join"}
@@ -352,8 +358,8 @@ export default function Sidebar() {
 
         {/* Footer */}
         <div className="px-4 py-2.5 border-t border-gray-100 dark:border-gray-700/50">
-          <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
-            FSP Chatters
+          <p className="text-[11px] text-gray-400 dark:text-gray-500 text-center">
+            Real-time chat · FS Pro
           </p>
         </div>
       </aside>
@@ -372,7 +378,7 @@ export default function Sidebar() {
               onKeyDown={(e) => e.key === "Enter" && handleCreateRoom()}
               placeholder="Room name"
               autoFocus
-              className="w-full rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+              className="w-full rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-500 mb-4"
             />
             <div className="flex gap-2 justify-end">
               <button
@@ -387,7 +393,7 @@ export default function Sidebar() {
               <button
                 onClick={handleCreateRoom}
                 disabled={!newRoomName.trim() || creating}
-                className="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium rounded-lg transition-colors"
+                className="px-4 py-2 text-sm bg-sky-600 hover:bg-sky-700 disabled:opacity-50 text-white font-medium rounded-lg transition-colors"
               >
                 {creating ? "Creating…" : "Create"}
               </button>

@@ -15,9 +15,9 @@ function formatTime(iso: string): string {
 }
 
 function DeliveryIcon({ status }: { status: "sent" | "delivered" | "sending" }) {
-  if (status === "sending") return <span className="text-blue-300/60">○</span>;
-  if (status === "sent") return <span className="text-blue-300">✓</span>;
-  return <span className="text-blue-200">✓✓</span>;
+  if (status === "sending") return <span className="text-sky-300/60">○</span>;
+  if (status === "sent") return <span className="text-sky-300">✓</span>;
+  return <span className="text-sky-200">✓✓</span>;
 }
 
 export default function MessageBubble({ message, isOwn }: Props) {
@@ -31,7 +31,7 @@ export default function MessageBubble({ message, isOwn }: Props) {
         <div
           className={`px-3.5 py-2 rounded-2xl text-sm leading-relaxed break-words ${
             isOwn
-              ? "bg-blue-600 text-white rounded-br-sm"
+              ? "bg-sky-600 text-white rounded-br-sm"
               : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-bl-sm"
           } ${isTemp ? "opacity-70" : ""}`}
         >

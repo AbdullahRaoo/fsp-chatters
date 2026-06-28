@@ -23,7 +23,7 @@ export default function UserListItem({
       href={`/chat/${user._id}`}
       className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors cursor-pointer ${
         isActive
-          ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+          ? "bg-sky-50 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400"
           : "hover:bg-gray-100 dark:hover:bg-gray-700/60 text-gray-800 dark:text-gray-200"
       }`}
     >
@@ -41,7 +41,7 @@ export default function UserListItem({
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium truncate">{user.name}</p>
         {isTyping ? (
-          <p className="text-xs text-blue-500">typing…</p>
+          <p className="text-xs text-sky-500">typing…</p>
         ) : (
           <p className="text-xs text-gray-400 dark:text-gray-500 truncate">
             {user.email}
@@ -50,7 +50,7 @@ export default function UserListItem({
       </div>
 
       {!!unreadCount && (
-        <span className="shrink-0 min-w-[1.25rem] h-5 px-1.5 flex items-center justify-center rounded-full bg-blue-600 text-white text-[10px] font-bold">
+        <span className="shrink-0 min-w-[1.25rem] h-5 px-1.5 flex items-center justify-center rounded-full bg-sky-600 text-white text-[10px] font-bold">
           {unreadCount > 99 ? "99+" : unreadCount}
         </span>
       )}

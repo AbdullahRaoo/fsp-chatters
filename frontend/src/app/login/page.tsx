@@ -6,6 +6,7 @@ import Link from "next/link";
 import axios from "axios";
 import { login } from "@/services/authService";
 import { useAuthStore } from "@/store/authStore";
+import Brand from "@/components/Brand";
 
 interface FieldErrors {
   email?: string;
@@ -73,13 +74,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 px-4">
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            FSP Chatters
-          </h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-50 via-white to-sky-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 px-4">
+      <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-lg shadow-sky-500/5 border border-gray-200 dark:border-gray-700 p-8">
+        <div className="mb-8 flex flex-col items-center text-center">
+          <Brand height={40} showText className="text-xl" />
+          <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
             Sign in to continue
           </p>
         </div>
@@ -94,7 +93,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
             />
             {fieldErrors.email && (
               <p className="mt-1 text-xs text-red-500">{fieldErrors.email}</p>
@@ -110,7 +109,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
             />
             {fieldErrors.password && (
               <p className="mt-1 text-xs text-red-500">
@@ -128,7 +127,7 @@ export default function LoginPage() {
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-medium text-sm rounded-lg py-2.5 transition-colors"
+            className="w-full bg-sky-600 hover:bg-sky-700 disabled:opacity-60 text-white font-medium text-sm rounded-lg py-2.5 transition-colors"
           >
             {loading ? "Signing in…" : "Sign In"}
           </button>
@@ -138,7 +137,7 @@ export default function LoginPage() {
           Don&apos;t have an account?{" "}
           <Link
             href="/register"
-            className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+            className="text-sky-600 dark:text-sky-400 hover:underline font-medium"
           >
             Register
           </Link>

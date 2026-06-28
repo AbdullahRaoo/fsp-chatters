@@ -1,6 +1,6 @@
 # FSP Chatters
 
-A full-stack real-time chat application supporting one-to-one private messaging and multi-user group rooms. Built with Next.js, Node/Express, MongoDB, and Socket.io — featuring JWT authentication, live presence, typing indicators, delivery status, dark mode, and unread message counters.
+A full-stack real-time chat application supporting one-to-one private messaging and multi-user group rooms. Built with Next.js, Node/Express, MongoDB, and Socket.io - featuring JWT authentication, live presence, typing indicators, delivery status, dark mode, and unread message counters.
 
 ---
 
@@ -20,7 +20,7 @@ A full-stack real-time chat application supporting one-to-one private messaging 
 ### Backend
 | Technology | Version | Role |
 |---|---|---|
-| Node.js | — | Runtime |
+| Node.js | - | Runtime |
 | Express | 5 | HTTP server and routing |
 | MongoDB + Mongoose | 9.7 | Database and ODM |
 | Socket.io | 4.8 | Real-time WebSocket server |
@@ -32,16 +32,16 @@ A full-stack real-time chat application supporting one-to-one private messaging 
 
 ## Features
 
-- **Authentication** — Register and login with email/password. Passwords are hashed with bcrypt (12 rounds). A JWT (1-day expiry) is issued on success and required for all protected routes.
-- **Private messaging** — Real-time one-to-one chat with full message history loaded from MongoDB on open.
-- **Group rooms** — Create named rooms, browse all rooms, join or leave rooms. Room membership is enforced on both the REST API (history) and the socket layer (broadcast).
-- **Live presence** — Online/offline status tracked via an in-memory server-side Map and broadcast to all connected clients on connect/disconnect.
-- **Typing indicators** — Debounced client-side emit; server relays to the conversation partner. Auto-clears after 1.5 seconds of inactivity.
-- **Message delivery status** — Private messages carry a `deliveryStatus` field (`sent` → `delivered`). The server upgrades status to `delivered` immediately if the recipient is online when the message arrives.
-- **Optimistic sending** — Messages appear instantly with a temporary ID and are replaced in-place when the server echo arrives (FIFO queue per conversation).
-- **Room access control** — Non-members see a gate screen with a Join button. Socket `join_room` and `room_message` events reject non-members at the server before touching the database.
-- **Dark mode** — Class-based (`dark` on `<html>`), toggled with a sun/moon button in the sidebar. Choice persists to `localStorage` and is applied via an inline script before first paint to eliminate flash.
-- **Unread message counters** — Badge on each user in the sidebar showing how many unread private messages have arrived while their conversation is not open. Cleared automatically when the conversation is opened.
+- **Authentication** - Register and login with email/password. Passwords are hashed with bcrypt (12 rounds). A JWT (1-day expiry) is issued on success and required for all protected routes.
+- **Private messaging** - Real-time one-to-one chat with full message history loaded from MongoDB on open.
+- **Group rooms** - Create named rooms, browse all rooms, join or leave rooms. Room membership is enforced on both the REST API (history) and the socket layer (broadcast).
+- **Live presence** - Online/offline status tracked via an in-memory server-side Map and broadcast to all connected clients on connect/disconnect.
+- **Typing indicators** - Debounced client-side emit; server relays to the conversation partner. Auto-clears after 1.5 seconds of inactivity.
+- **Message delivery status** - Private messages carry a `deliveryStatus` field (`sent` → `delivered`). The server upgrades status to `delivered` immediately if the recipient is online when the message arrives.
+- **Optimistic sending** - Messages appear instantly with a temporary ID and are replaced in-place when the server echo arrives (FIFO queue per conversation).
+- **Room access control** - Non-members see a gate screen with a Join button. Socket `join_room` and `room_message` events reject non-members at the server before touching the database.
+- **Dark mode** - Class-based (`dark` on `<html>`), toggled with a sun/moon button in the sidebar. Choice persists to `localStorage` and is applied via an inline script before first paint to eliminate flash.
+- **Unread message counters** - Badge on each user in the sidebar showing how many unread private messages have arrived while their conversation is not open. Cleared automatically when the conversation is opened.
 
 ---
 
@@ -52,14 +52,14 @@ A full-stack real-time chat application supporting one-to-one private messaging 
 - Node.js 18 or later
 - A [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) cluster (or any accessible MongoDB instance)
 
-### 1 — Clone the repository
+### 1 - Clone the repository
 
 ```bash
 git clone <repo-url>
 cd fsp-chatters
 ```
 
-### 2 — Backend setup
+### 2 - Backend setup
 
 ```bash
 cd backend
@@ -69,7 +69,7 @@ npm install
 Create `backend/.env` (see [Environment Variables](#environment-variables) below), then:
 
 ```bash
-# Development — auto-restarts on file changes (requires nodemon)
+# Development - auto-restarts on file changes (requires nodemon)
 npm run dev
 
 # Production
@@ -78,7 +78,7 @@ npm start
 
 The server listens on `http://localhost:5000` by default.
 
-### 3 — Frontend setup
+### 3 - Frontend setup
 
 Open a second terminal:
 
@@ -99,7 +99,7 @@ The app is available at `http://localhost:3000`.
 
 ## Environment Variables
 
-### Backend — `backend/.env`
+### Backend - `backend/.env`
 
 ```env
 MONGODB_URI="mongodb+srv://<user>:<password>@<cluster>.mongodb.net/<dbname>"
@@ -113,7 +113,7 @@ JWT_SECRET="replace-with-a-long-random-secret"
 | `PORT` | Port the Express server listens on. Defaults to `5000` if omitted. |
 | `JWT_SECRET` | Secret used to sign and verify JWTs. Use a long, random string in production. |
 
-### Frontend — `frontend/.env.local`
+### Frontend - `frontend/.env.local`
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:5000/api
@@ -131,11 +131,11 @@ NEXT_PUBLIC_SOCKET_URL=http://localhost:5000
 
 ### Authentication Flow
 
-1. **Register** — `POST /api/auth/register` validates the request body with express-validator, checks for a duplicate email, then creates a `User` document. The Mongoose model has an async `pre('save')` hook that bcrypt-hashes the password before the document is written; the plain-text password is never stored.
-2. **Login** — `POST /api/auth/login` fetches the user with `select('+password')` (the field is excluded by default in the schema), calls the `comparePassword` instance method, then signs a JWT containing `{ userId }` with a 1-day expiry.
-3. **REST protection** — The `protect` middleware (`middleware/auth.js`) reads the `Authorization: Bearer <token>` header, verifies the token, looks up the user (no password selected), and attaches it to `req.user`. Every route group except `/api/auth` applies this middleware via `router.use(protect)`.
-4. **Socket protection** — `sockets/socketAuth.js` is registered as a Socket.io middleware (runs before any event handler). It reads `socket.handshake.auth.token` and verifies it with the same `JWT_SECRET`, then attaches `socket.userId`. Connections with a missing or invalid token are rejected immediately with an error event.
-5. **Client storage** — The JWT is stored in `localStorage` under `fsp_token`. An axios request interceptor attaches it as a Bearer token to every outgoing API call. Because `localStorage` is inaccessible server-side, route protection is done client-side via `useEffect` + `useRouter` in the chat layout, guarded by an `isInitialized` flag to prevent redirect flicker before the store is hydrated.
+1. **Register** - `POST /api/auth/register` validates the request body with express-validator, checks for a duplicate email, then creates a `User` document. The Mongoose model has an async `pre('save')` hook that bcrypt-hashes the password before the document is written; the plain-text password is never stored.
+2. **Login** - `POST /api/auth/login` fetches the user with `select('+password')` (the field is excluded by default in the schema), calls the `comparePassword` instance method, then signs a JWT containing `{ userId }` with a 1-day expiry.
+3. **REST protection** - The `protect` middleware (`middleware/auth.js`) reads the `Authorization: Bearer <token>` header, verifies the token, looks up the user (no password selected), and attaches it to `req.user`. Every route group except `/api/auth` applies this middleware via `router.use(protect)`.
+4. **Socket protection** - `sockets/socketAuth.js` is registered as a Socket.io middleware (runs before any event handler). It reads `socket.handshake.auth.token` and verifies it with the same `JWT_SECRET`, then attaches `socket.userId`. Connections with a missing or invalid token are rejected immediately with an error event.
+5. **Client storage** - The JWT is stored in `localStorage` under `fsp_token`. An axios request interceptor attaches it as a Bearer token to every outgoing API call. Because `localStorage` is inaccessible server-side, route protection is done client-side via `useEffect` + `useRouter` in the chat layout, guarded by an `isInitialized` flag to prevent redirect flicker before the store is hydrated.
 
 ### Socket Architecture
 
@@ -145,22 +145,22 @@ Server-side event handlers are split by domain:
 
 | File | Responsibility |
 |---|---|
-| `sockets/socketAuth.js` | JWT middleware — runs before any event handler, attaches `socket.userId` |
+| `sockets/socketAuth.js` | JWT middleware - runs before any event handler, attaches `socket.userId` |
 | `sockets/presence.js` | In-memory `Map<userId, socketId>`; broadcasts the full `online_users` array on every connect/disconnect |
-| `sockets/privateMessageHandler.js` | `private_message`, `typing`, `stop_typing` — saves messages, upgrades delivery status if receiver is online, emits to receiver and echoes to sender |
-| `sockets/roomHandler.js` | `join_room`, `leave_room`, `room_message` — verifies DB membership before `socket.join()` or saving a message; broadcasts via `io.to(roomId).emit()` |
+| `sockets/privateMessageHandler.js` | `private_message`, `typing`, `stop_typing` - saves messages, upgrades delivery status if receiver is online, emits to receiver and echoes to sender |
+| `sockets/roomHandler.js` | `join_room`, `leave_room`, `room_message` - verifies DB membership before `socket.join()` or saving a message; broadcasts via `io.to(roomId).emit()` |
 
 Room broadcasts use Socket.io's built-in room channels. Only clients that have successfully passed the `join_room` membership check are subscribed to the channel; non-members cannot receive or inject messages even if they construct the event manually.
 
 ### Database Design
 
-**`User`** — `name`, `email` (unique index), `password` (`select: false` — excluded from all queries by default), timestamps.
+**`User`** - `name`, `email` (unique index), `password` (`select: false` - excluded from all queries by default), timestamps.
 
-**`PrivateMessage`** — `sender` (ref: User), `receiver` (ref: User), `content`, `deliveryStatus` (enum: `sent` | `delivered`, default `sent`), timestamps. History queries use a bidirectional `$or` filter on sender/receiver pairs, sorted ascending by `createdAt`, with sender populated.
+**`PrivateMessage`** - `sender` (ref: User), `receiver` (ref: User), `content`, `deliveryStatus` (enum: `sent` | `delivered`, default `sent`), timestamps. History queries use a bidirectional `$or` filter on sender/receiver pairs, sorted ascending by `createdAt`, with sender populated.
 
-**`RoomMessage`** — `sender` (ref: User), `room` (ref: Room), `content`, timestamps. Kept as a separate collection from `PrivateMessage` because the two types have structurally different fields (no delivery status in rooms; room messages display a sender name above the bubble) and different query patterns (filter by room vs. filter by sender/receiver pair).
+**`RoomMessage`** - `sender` (ref: User), `room` (ref: Room), `content`, timestamps. Kept as a separate collection from `PrivateMessage` because the two types have structurally different fields (no delivery status in rooms; room messages display a sender name above the bubble) and different query patterns (filter by room vs. filter by sender/receiver pair).
 
-**`Room`** — `name`, `members` (array of User refs), `createdBy` (ref: User), timestamps. Membership is an embedded ObjectId array. All write operations (`join`, `leave`) and access-control checks (socket events, message history) read directly from this array.
+**`Room`** - `name`, `members` (array of User refs), `createdBy` (ref: User), timestamps. Membership is an embedded ObjectId array. All write operations (`join`, `leave`) and access-control checks (socket events, message history) read directly from this array.
 
 ### State Management
 
@@ -175,9 +175,9 @@ The frontend uses four [Zustand](https://github.com/pmndrs/zustand) stores:
 
 **Why Zustand over Redux or Context?**
 
-- **Versus Redux** — no action/reducer/selector boilerplate. Socket event callbacks run outside React and need to update state (e.g., incrementing `unreadCounts`). Zustand's `getState()` and `setState()` work directly outside components; Redux requires passing the store reference around or using middleware.
-- **Versus Context** — Context re-renders every consumer whenever any part of the value changes. Zustand uses selector-based subscriptions, so a component that reads only `unreadCounts` does not re-render when `onlineUsers` changes.
-- **Tradeoff** — Zustand stores are module-level singletons not tied to the React component tree. They are not automatically reset between test runs or on hot reload. This is rarely a problem in production but requires explicit reset logic in testing environments.
+- **Versus Redux** - no action/reducer/selector boilerplate. Socket event callbacks run outside React and need to update state (e.g., incrementing `unreadCounts`). Zustand's `getState()` and `setState()` work directly outside components; Redux requires passing the store reference around or using middleware.
+- **Versus Context** - Context re-renders every consumer whenever any part of the value changes. Zustand uses selector-based subscriptions, so a component that reads only `unreadCounts` does not re-render when `onlineUsers` changes.
+- **Tradeoff** - Zustand stores are module-level singletons not tied to the React component tree. They are not automatically reset between test runs or on hot reload. This is rarely a problem in production but requires explicit reset logic in testing environments.
 
 ### Folder Structure
 
@@ -186,7 +186,7 @@ fsp-chatters/
 ├── backend/
 │   └── src/
 │       ├── config/           # MongoDB connection helper (connectDB)
-│       ├── controllers/      # HTTP layer — parse req, delegate to service, send res
+│       ├── controllers/      # HTTP layer - parse req, delegate to service, send res
 │       │   ├── authController.js
 │       │   ├── userController.js
 │       │   ├── roomController.js
@@ -200,7 +200,7 @@ fsp-chatters/
 │       │   ├── Room.js
 │       │   ├── PrivateMessage.js
 │       │   └── RoomMessage.js
-│       ├── routes/            # Express routers — apply middleware, map to controllers
+│       ├── routes/            # Express routers - apply middleware, map to controllers
 │       │   ├── authRoutes.js
 │       │   ├── userRoutes.js
 │       │   ├── roomRoutes.js
@@ -269,9 +269,9 @@ Authorization: Bearer <token>
 
 | Method | Path | Auth | Description |
 |---|---|---|---|
-| `POST` | `/api/auth/register` | — | Create account. Body: `{ name, email, password }`. Returns `{ user, token }`. |
-| `POST` | `/api/auth/login` | — | Sign in. Body: `{ email, password }`. Returns `{ user, token }`. |
-| `POST` | `/api/auth/logout` | — | Stateless no-op (token management is client-side). |
+| `POST` | `/api/auth/register` | - | Create account. Body: `{ name, email, password }`. Returns `{ user, token }`. |
+| `POST` | `/api/auth/login` | - | Sign in. Body: `{ email, password }`. Returns `{ user, token }`. |
+| `POST` | `/api/auth/logout` | - | Stateless no-op (token management is client-side). |
 | `GET` | `/api/users` | ✓ | All users except the requester. |
 | `GET` | `/api/users/search?q=` | ✓ | Case-insensitive regex search on name and email. |
 | `GET` | `/api/rooms` | ✓ | All rooms with populated `members` and `createdBy`. |
@@ -319,7 +319,7 @@ Socket payloads contain `sender` as a raw ObjectId string (the server does not p
 
 ### Optimistic sending
 
-When a user sends a message, a temporary entry (id prefixed `temp-{timestamp}`) is prepended to the local list immediately — no waiting for a round trip. The server echo arrives via the socket shortly after; a FIFO `pendingQueue` ref (one per open conversation) matches the echo to its temporary placeholder and replaces it in-place. Temporary messages render at reduced opacity with a `○` indicator so the user gets instant feedback throughout.
+When a user sends a message, a temporary entry (id prefixed `temp-{timestamp}`) is prepended to the local list immediately - no waiting for a round trip. The server echo arrives via the socket shortly after; a FIFO `pendingQueue` ref (one per open conversation) matches the echo to its temporary placeholder and replaces it in-place. Temporary messages render at reduced opacity with a `○` indicator so the user gets instant feedback throughout.
 
 ### Delivery status
 

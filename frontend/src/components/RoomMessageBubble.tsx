@@ -34,7 +34,7 @@ export default function RoomMessageBubble({ message, isOwn }: Props) {
         <div
           className={`px-3.5 py-2 rounded-2xl text-sm leading-relaxed break-words ${
             isOwn
-              ? "bg-blue-600 text-white rounded-br-sm"
+              ? "bg-sky-600 text-white rounded-br-sm"
               : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-bl-sm"
           } ${isTemp ? "opacity-70" : ""}`}
         >

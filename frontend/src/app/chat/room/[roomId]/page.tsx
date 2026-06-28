@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { use } from "react";
+import Link from "next/link";
 import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
 import { useSocketStore } from "@/store/socketStore";
@@ -195,7 +196,7 @@ export default function RoomChatPage({
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-sky-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -229,10 +230,15 @@ export default function RoomChatPage({
           <button
             onClick={handleJoin}
             disabled={joining}
-            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+            className="px-5 py-2 bg-sky-600 hover:bg-sky-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
           >
             {joining ? "Joining…" : "Join Room"}
           </button>
+          <div className="mt-4 md:hidden">
+            <Link href="/chat" className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
+              ← Back to list
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -243,6 +249,15 @@ export default function RoomChatPage({
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shrink-0">
+        <Link
+          href="/chat"
+          className="md:hidden -ml-1 p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+          aria-label="Back to list"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </Link>
         <div className="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center text-sm font-bold text-indigo-600 dark:text-indigo-400">
           #
         </div>
@@ -290,13 +305,13 @@ export default function RoomChatPage({
             onKeyDown={handleKeyDown}
             placeholder={`Message #${room?.name ?? "room"}…`}
             rows={1}
-            className="flex-1 resize-none rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent max-h-32 overflow-y-auto"
+            className="flex-1 resize-none rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent max-h-32 overflow-y-auto"
             style={{ lineHeight: "1.5" }}
           />
           <button
             onClick={handleSend}
             disabled={!input.trim()}
-            className="shrink-0 w-10 h-10 flex items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="shrink-0 w-10 h-10 flex items-center justify-center rounded-xl bg-sky-600 hover:bg-sky-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             <svg
               className="w-4 h-4 text-white"
