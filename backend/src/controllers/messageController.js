@@ -14,7 +14,10 @@ const getPrivateConversation = async (req, res, next) => {
 
 const getRoomMessages = async (req, res, next) => {
   try {
-    const messages = await messageService.getRoomMessages(req.params.roomId);
+    const messages = await messageService.getRoomMessages(
+      req.params.roomId,
+      req.user._id
+    );
     res.status(200).json(messages);
   } catch (error) {
     next(error);

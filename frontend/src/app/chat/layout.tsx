@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { useSocket } from "@/hooks/useSocket";
+import Sidebar from "@/components/Sidebar";
 
 function SocketInitializer() {
   useSocket();
@@ -39,9 +40,12 @@ export default function ChatLayout({
   if (!token) return null;
 
   return (
-    <>
+    <div className="flex h-screen overflow-hidden bg-white">
       <SocketInitializer />
-      {children}
-    </>
+      <Sidebar />
+      <main className="flex flex-1 min-w-0 flex-col overflow-hidden">
+        {children}
+      </main>
+    </div>
   );
 }
