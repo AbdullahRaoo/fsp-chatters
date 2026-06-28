@@ -22,8 +22,11 @@ export function useSocket() {
   }, [currentUser]);
 
   // ── Socket connection ────────────────────────────────────────────────────────
+  // Guard prevents a second socket being created when multiple components call
+  // useSocket() (e.g. SocketInitializer in layout + the active chat page).
   useEffect(() => {
     if (!token) return;
+    if (useSocketStore.getState().socket) return;
 
     const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_URL!, {
       auth: { token },
@@ -43,6 +46,27 @@ export function useSocket() {
       setTyping(senderId, false);
     });
 
+    // Registered here (once per socket) so multiple useSocket() callers don't
+    // each add their own listener and multiply the count.
+    newSocket.on(
+      "private_message",
+      (raw: { sender: { _id: string } | string; receiver: string }) => {
+        const senderId =
+          typeof raw.sender === "object" ? raw.sender._id : raw.sender;
+
+        // Skip echoes of own sent messages
+        if (senderId === currentUserRef.current?._id) return;
+
+        // Skip if the conversation is currently open
+        const match = pathnameRef.current?.match(
+          /^\/chat\/(?!room\/)([^/]+)$/
+        );
+        if (senderId === match?.[1]) return;
+
+        incrementUnread(senderId);
+      }
+    );
+
     setSocket(newSocket);
 
     return () => {
@@ -50,39 +74,7 @@ export function useSocket() {
       setSocket(null);
       setOnlineUsers([]);
     };
-  }, [token, setSocket, setOnlineUsers, setTyping]);
-
-  // ── Global unread counter ─────────────────────────────────────────────────────
-  // Registered separately so it always uses the latest pathnameRef without
-  // reconnecting the socket on every navigation.
-  useEffect(() => {
-    if (!socket) return;
-
-    const handlePrivateMessage = (raw: {
-      sender: { _id: string } | string;
-      receiver: string;
-    }) => {
-      const senderId =
-        typeof raw.sender === "object" ? raw.sender._id : raw.sender;
-
-      // Skip echoes of the current user's own sent messages
-      if (senderId === currentUserRef.current?._id) return;
-
-      // Skip if this conversation is currently open
-      const match = pathnameRef.current?.match(
-        /^\/chat\/(?!room\/)([^/]+)$/
-      );
-      const openUserId = match?.[1];
-      if (senderId === openUserId) return;
-
-      incrementUnread(senderId);
-    };
-
-    socket.on("private_message", handlePrivateMessage);
-    return () => {
-      socket.off("private_message", handlePrivateMessage);
-    };
-  }, [socket, incrementUnread]);
+  }, [token, setSocket, setOnlineUsers, setTyping, incrementUnread]);
 
   // ── Actions ──────────────────────────────────────────────────────────────────
   const sendPrivateMessage = useCallback(
