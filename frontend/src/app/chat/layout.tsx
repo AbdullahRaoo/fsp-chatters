@@ -3,6 +3,12 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
+import { useSocket } from "@/hooks/useSocket";
+
+function SocketInitializer() {
+  useSocket();
+  return null;
+}
 
 export default function ChatLayout({
   children,
@@ -32,5 +38,10 @@ export default function ChatLayout({
 
   if (!token) return null;
 
-  return <>{children}</>;
+  return (
+    <>
+      <SocketInitializer />
+      {children}
+    </>
+  );
 }
