@@ -20,7 +20,7 @@ A full-stack real-time chat application supporting one-to-one private messaging 
 ### Backend
 | Technology | Version | Role |
 |---|---|---|
-| Node.js | - | Runtime |
+| Node.js | 20.9+ | Runtime (Next.js 16 requires Node 20.9 or later) |
 | Express | 5 | HTTP server and routing |
 | MongoDB + Mongoose | 9.7 | Database and ODM |
 | Socket.io | 4.8 | Real-time WebSocket server |
@@ -49,7 +49,7 @@ A full-stack real-time chat application supporting one-to-one private messaging 
 
 ### Prerequisites
 
-- Node.js 18 or later
+- Node.js 20.9 or later (required by Next.js 16)
 - A [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) cluster (or any accessible MongoDB instance)
 
 ### 1 - Clone the repository
