@@ -213,13 +213,13 @@ export default function RoomChatPage({
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center max-w-xs">
-          <div className="w-14 h-14 rounded-full bg-indigo-100 flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-indigo-500">
+          <div className="w-14 h-14 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-indigo-500 dark:text-indigo-400">
             #
           </div>
-          <p className="text-base font-semibold text-gray-900 mb-1">
+          <p className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-1">
             {room?.name}
           </p>
-          <p className="text-sm text-gray-400 mb-5">
+          <p className="text-sm text-gray-400 dark:text-gray-500 mb-5">
             You&apos;re not a member of this room. Join to read and send
             messages.
           </p>
@@ -242,15 +242,15 @@ export default function RoomChatPage({
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 bg-white shrink-0">
-        <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-sm font-bold text-indigo-600">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shrink-0">
+        <div className="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center text-sm font-bold text-indigo-600 dark:text-indigo-400">
           #
         </div>
         <div>
-          <p className="text-sm font-semibold text-gray-900">
+          <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
             {room?.name ?? "Room"}
           </p>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-gray-400 dark:text-gray-500">
             {room?.members.length ?? 0}{" "}
             {room?.members.length === 1 ? "member" : "members"}
           </p>
@@ -261,7 +261,7 @@ export default function RoomChatPage({
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-400 dark:text-gray-500">
               No messages yet. Start the conversation!
             </p>
           </div>
@@ -282,7 +282,7 @@ export default function RoomChatPage({
       </div>
 
       {/* Input */}
-      <div className="px-4 py-3 border-t border-gray-200 bg-white shrink-0">
+      <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shrink-0">
         <div className="flex items-end gap-2">
           <textarea
             value={input}
@@ -290,7 +290,7 @@ export default function RoomChatPage({
             onKeyDown={handleKeyDown}
             placeholder={`Message #${room?.name ?? "room"}…`}
             rows={1}
-            className="flex-1 resize-none rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent max-h-32 overflow-y-auto"
+            className="flex-1 resize-none rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent max-h-32 overflow-y-auto"
             style={{ lineHeight: "1.5" }}
           />
           <button

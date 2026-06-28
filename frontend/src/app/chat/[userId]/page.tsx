@@ -10,8 +10,6 @@ import { getUsers } from "@/services/userService";
 import { User, PrivateMessage } from "@/types";
 import MessageBubble from "@/components/MessageBubble";
 
-// The server emits sender as an ObjectId string (not populated) from socket events.
-// HTTP history returns populated User objects. We normalize both here.
 type RawSocketMessage = Omit<PrivateMessage, "sender"> & {
   sender: User | string;
 };
@@ -32,7 +30,7 @@ export default function PrivateChatPage({
 }) {
   const { userId } = use(params);
   const { user: currentUser } = useAuthStore();
-  const { socket, typingUsers, onlineUsers } = useSocketStore();
+  const { socket, typingUsers, onlineUsers, clearUnread } = useSocketStore();
   const { sendPrivateMessage, emitTyping, emitStopTyping } = useSocket();
 
   const [otherUser, setOtherUser] = useState<User | null>(null);
@@ -44,13 +42,16 @@ export default function PrivateChatPage({
   const bottomRef = useRef<HTMLDivElement>(null);
   const isTypingRef = useRef(false);
   const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // FIFO queue to match optimistic messages to server echoes
   const pendingQueue = useRef<string[]>([]);
 
-  // ── Fetch history + other user info ────────────────────────────────────────
+  // ── Clear unread when conversation opens ────────────────────────────────────
+  useEffect(() => {
+    clearUnread(userId);
+  }, [userId, clearUnread]);
+
+  // ── Fetch history + other user info ─────────────────────────────────────────
   useEffect(() => {
     if (!userId) return;
-
     const load = async () => {
       try {
         const [history, users] = await Promise.all([
@@ -66,16 +67,15 @@ export default function PrivateChatPage({
         setLoading(false);
       }
     };
-
     load();
   }, [userId]);
 
-  // ── Auto-scroll on new messages ─────────────────────────────────────────────
+  // ── Auto-scroll on new messages ──────────────────────────────────────────────
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // ── Incoming socket messages ────────────────────────────────────────────────
+  // ── Incoming socket messages ─────────────────────────────────────────────────
   useEffect(() => {
     if (!socket || !currentUser || !otherUser) return;
 
@@ -83,9 +83,9 @@ export default function PrivateChatPage({
       const senderId =
         typeof raw.sender === "object" ? raw.sender._id : raw.sender;
 
-      // Only handle messages that belong to this conversation
       const isFromOther = senderId === userId;
-      const isEchoFromSelf = senderId === currentUser._id && raw.receiver === userId;
+      const isEchoFromSelf =
+        senderId === currentUser._id && raw.receiver === userId;
       if (!isFromOther && !isEchoFromSelf) return;
 
       const normalized: PrivateMessage = {
@@ -94,14 +94,12 @@ export default function PrivateChatPage({
       };
 
       if (isEchoFromSelf) {
-        // Replace the oldest pending optimistic message
         const tempId = pendingQueue.current.shift();
         if (tempId) {
           setMessages((prev) =>
             prev.map((m) => (m._id === tempId ? normalized : m))
           );
         } else {
-          // No pending temp — just append (reconnect edge case)
           setMessages((prev) => [...prev, normalized]);
         }
       } else {
@@ -115,17 +113,15 @@ export default function PrivateChatPage({
     };
   }, [socket, currentUser, otherUser, userId]);
 
-  // ── Send message ────────────────────────────────────────────────────────────
+  // ── Send message ─────────────────────────────────────────────────────────────
   const handleSend = useCallback(() => {
     const content = input.trim();
     if (!content || !currentUser || !otherUser) return;
 
-    // Stop typing indicator
     if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
     isTypingRef.current = false;
     emitStopTyping(userId);
 
-    // Optimistic message
     const tempId = `temp-${Date.now()}`;
     const optimistic: PrivateMessage = {
       _id: tempId,
@@ -138,11 +134,10 @@ export default function PrivateChatPage({
     pendingQueue.current.push(tempId);
     setMessages((prev) => [...prev, optimistic]);
     setInput("");
-
     sendPrivateMessage(userId, content);
   }, [input, currentUser, otherUser, userId, sendPrivateMessage, emitStopTyping]);
 
-  // ── Typing indicator ────────────────────────────────────────────────────────
+  // ── Typing indicator ─────────────────────────────────────────────────────────
   const handleInputChange = (value: string) => {
     setInput(value);
 
@@ -174,7 +169,6 @@ export default function PrivateChatPage({
     }
   };
 
-  // ── Derived state ───────────────────────────────────────────────────────────
   const isOtherOnline = onlineUsers.includes(userId);
   const isOtherTyping = typingUsers[userId] ?? false;
 
@@ -197,27 +191,23 @@ export default function PrivateChatPage({
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 bg-white shrink-0">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shrink-0">
         <div className="relative">
-          <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-sm font-semibold text-gray-600 uppercase">
+          <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-sm font-semibold text-gray-600 dark:text-gray-300 uppercase">
             {otherUser?.name.charAt(0) ?? "?"}
           </div>
           <span
-            className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white ${
-              isOtherOnline ? "bg-green-500" : "bg-gray-400"
+            className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-gray-900 ${
+              isOtherOnline ? "bg-green-500" : "bg-gray-400 dark:bg-gray-600"
             }`}
           />
         </div>
         <div>
-          <p className="text-sm font-semibold text-gray-900">
+          <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
             {otherUser?.name ?? "Unknown user"}
           </p>
-          <p className="text-xs text-gray-400">
-            {isOtherTyping
-              ? "typing…"
-              : isOtherOnline
-              ? "Online"
-              : "Offline"}
+          <p className="text-xs text-gray-400 dark:text-gray-500">
+            {isOtherTyping ? "typing…" : isOtherOnline ? "Online" : "Offline"}
           </p>
         </div>
       </div>
@@ -226,7 +216,7 @@ export default function PrivateChatPage({
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-400 dark:text-gray-500">
               No messages yet. Say hello!
             </p>
           </div>
@@ -247,7 +237,7 @@ export default function PrivateChatPage({
       </div>
 
       {/* Input */}
-      <div className="px-4 py-3 border-t border-gray-200 bg-white shrink-0">
+      <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shrink-0">
         <div className="flex items-end gap-2">
           <textarea
             value={input}
@@ -255,7 +245,7 @@ export default function PrivateChatPage({
             onKeyDown={handleKeyDown}
             placeholder="Type a message… (Enter to send)"
             rows={1}
-            className="flex-1 resize-none rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent max-h-32 overflow-y-auto"
+            className="flex-1 resize-none rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent max-h-32 overflow-y-auto"
             style={{ lineHeight: "1.5" }}
           />
           <button

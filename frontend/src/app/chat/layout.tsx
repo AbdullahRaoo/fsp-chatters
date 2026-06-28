@@ -31,7 +31,7 @@ export default function ChatLayout({
 
   if (!isInitialized) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -40,7 +40,7 @@ export default function ChatLayout({
   if (!token) return null;
 
   return (
-    <div className="flex h-screen overflow-hidden bg-white">
+    <div className="flex h-screen overflow-hidden bg-white dark:bg-gray-900">
       <SocketInitializer />
       <Sidebar />
       <main className="flex flex-1 min-w-0 flex-col overflow-hidden">

@@ -1,10 +1,10 @@
 export default function ChatPage() {
   return (
-    <div className="flex-1 flex items-center justify-center bg-gray-50">
+    <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-950">
       <div className="text-center">
-        <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3">
+        <div className="w-14 h-14 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-3">
           <svg
-            className="w-7 h-7 text-gray-400"
+            className="w-7 h-7 text-gray-400 dark:text-gray-500"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -17,10 +17,10 @@ export default function ChatPage() {
             />
           </svg>
         </div>
-        <p className="text-sm font-medium text-gray-600">
+        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
           Select a conversation
         </p>
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
           Choose a user from the sidebar to start chatting
         </p>
       </div>
