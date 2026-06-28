@@ -5,6 +5,8 @@ const cors = require("cors");
 const { Server } = require("socket.io");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
+const roomRoutes = require("./routes/roomRoutes");
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
@@ -24,6 +26,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/rooms", roomRoutes);
 
 app.use(errorHandler);
 
